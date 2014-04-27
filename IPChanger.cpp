@@ -2,12 +2,14 @@
 //
 
 #include "stdafx.h"
+#define VER L"1.0"
 
 int SelectNetCard();
 int SelectPlace();
 void SetUpConfig(WCHAR * nowNetName);
 
 std::vector<WCHAR *> netNameVector;
+std::vector<WCHAR *> placeNameVector;
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -32,7 +34,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	SetUpConfig(nowNetName);
 
-	printf("\n설정완료!");
+	printf("\n설정완료!(종료하실려면 엔터를 눌러주세요.)");
 	getch();
 
 	netNameVector.clear();
@@ -42,8 +44,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;  
 }
 
+void ScreenClear();
+
 int SelectNetCard()
 {
+	ScreenClear();
+
 	printf("네트워크 카드를 선택하세요!(무선 or 유선)\n");
 	
 
@@ -60,7 +66,6 @@ int SelectNetCard()
 
 	if(selec > netNameVector.size() || selec <= 0)
 	{
-		system("cls");
 		SelectNetCard();
 	}
 	else
@@ -72,22 +77,26 @@ int SelectNetCard()
 
 int SelectPlace()
 {
-	system("cls");
+	ScreenClear();
 
 	printf("현재 위치를 선택해주세요!\n");
-	printf("1 . 전공실(유선/수동할당)\n");
-	printf("2 . 매점  (유선/수동할당)\n");
-	printf("3 . 작화실(유선/수동할당)\n");
-	printf("4 . 작화실(무선/수동할당)\n");
-	printf("5 . 전공실(무선/자동할당)\n");
-	printf("6 . 랩실  (무선/자동할당)\n");
-	printf("7 . 기타  (집, Egg사용)\n");
+	placeNameVector.push_back(L"1 . 전공실(유선/수동할당)\n");
+	placeNameVector.push_back(L"2 . 매점  (유선/수동할당)\n");
+	placeNameVector.push_back(L"3 . 작화실(유선/수동할당)\n");
+	placeNameVector.push_back(L"4 . 작화실(무선/수동할당)\n");
+	placeNameVector.push_back(L"5 . 전공실(무선/자동할당)\n");
+	placeNameVector.push_back(L"6 . 랩실  (무선/자동할당)\n");
+	placeNameVector.push_back(L"7 . 기타  (집, Egg사용)\n");
+	for(int i =0; i<placeNameVector.size(); i++)
+	{
+		wprintf(L"%s",placeNameVector[i]);
+	}
 
 	printf("선택 : ");
 	int selec=0;
 	scanf("%d",&selec);
 
-	if(selec <=0 || selec >4)
+	if(selec <=0 || selec >placeNameVector.size())
 	{
 		SelectPlace();
 	}
@@ -99,7 +108,7 @@ int SelectPlace()
 
 void SetUpConfig(WCHAR * nowNetName)
 {
-	system("cls");
+	ScreenClear();
 	wprintf(L"현재 선택한 네트워크 카드 : %s",nowNetName);
 	printf("\n계속하려면 엔터를 눌러주세요.");
 	_getch();
@@ -108,14 +117,21 @@ void SetUpConfig(WCHAR * nowNetName)
 	WCHAR command2[128];
 	WCHAR command3[128];
 
-	switch(SelectPlace())
+	int selec = SelectPlace();
+
+	ScreenClear();
+	wprintf(L"현재 선택한 장소 : %s",placeNameVector[selec-1]);
+	printf("\n계속하려면 엔터를 눌러주세요.");
+	_getch();
+
+	switch(selec)
 	{
-		system("cls");
+	ScreenClear();
 	case 1:
 	case 2:
 	case 3:
 		//번호 입력
-		printf("\n학번을 입력해주세요 : ");
+		printf("\n번호를 입력해주세요(현재 3학년 게임과만 지원) : ");
 		int number1;
 		scanf("%d",&number1);
 		wsprintf(command1,L"interface ip set address name=\"%s\" source=static address=\"172.216.19.%d\" mask=\"255.255.248.0\" gateway=\"172.216.16.1\"",nowNetName,number1 + 174);
@@ -127,7 +143,7 @@ void SetUpConfig(WCHAR * nowNetName)
 		break;
 	case 4:
 		//번호 입력
-		printf("\n자리번호를 입력해주세요 : ");
+		printf("\n자리번호를 입력해주세요(현재 3학년 작화실만 지원) : ");
 		int number2;
 		scanf("%d",&number2);
 		wsprintf(command1,L"interface ip set address name=\"%s\" source=static address=\"172.216.21.%d\" mask=\"255.255.248.0\" gateway=\"172.216.16.1\"",nowNetName,number2);
@@ -146,5 +162,15 @@ void SetUpConfig(WCHAR * nowNetName)
 		ShellExecuteW( NULL , L"runas" , L"netsh.exe" , command2, NULL, SW_SHOW );
 		break;
 	}
+
+
+}
+
+void ScreenClear()
+{
+	system("cls");
+
+	wprintf(L"->애니원 네트워크 도우미 %s<-\n",VER);
+	printf("->제작자 : 이강희(rkdgml6332@gmail.com)<-\n\n");
 }
 
